@@ -141,7 +141,7 @@ public final class Permission {
     }
 
     public boolean isReviewRequired() {
-        return (mFlags & PackageManager.FLAG_PERMISSION_REVIEW_REQUIRED) != 0;
+        return  (mFlags & PackageManager.FLAG_PERMISSION_REVIEW_REQUIRED) != 0;
     }
 
     public void unsetReviewRequired() {

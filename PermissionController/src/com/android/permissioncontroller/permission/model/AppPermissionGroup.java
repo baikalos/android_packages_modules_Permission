@@ -802,6 +802,8 @@ public final class AppPermissionGroup implements Comparable<AppPermissionGroup> 
             return false;
         }
 
+        Log.w(LOG_TAG, "appops: setUidMode" + op + " uid=" + uid + " mode=" + mode, new Throwable());
+
         mAppOps.setUidMode(op, uid, mode);
         return true;
     }

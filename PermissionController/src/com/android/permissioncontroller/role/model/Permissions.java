@@ -51,7 +51,7 @@ public class Permissions {
 
     private static final String LOG_TAG = Permissions.class.getSimpleName();
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static ArrayMap<String, String> sForegroundToBackgroundPermission;
     private static ArrayMap<String, List<String>> sBackgroundToForegroundPermissions;
@@ -410,6 +410,10 @@ public class Permissions {
             return false;
         }
 
+        if (DEBUG) {
+            Log.i(LOG_TAG, "Revoke " + permissionsToRevoke + " for " + packageName, new Throwable());
+        }
+
         // Sort background permissions first so that we can revoke a foreground permission based on
         // whether its background permission is revoked.
         int permissionsToRevokeSize = permissionsToRevoke.size();
@@ -673,7 +677,7 @@ public class Permissions {
         }
         PackageManager packageManager = context.getPackageManager();
         UserHandle user = Process.myUserHandle();
-        packageManager.revokeRuntimePermission(packageName, permission, user);
+        //packageManager.revokeRuntimePermission(packageName, permission, user);
         return true;
     }
 
@@ -826,6 +830,9 @@ public class Permissions {
             return false;
         }
         AppOpsManager appOpsManager = context.getSystemService(AppOpsManager.class);
+
+        Log.w(LOG_TAG, "appops: set(Uid)Mode" + appOp + " uid=" + applicationInfo.uid + " mode=" + mode, new Throwable());
+
         if (setUidMode) {
             appOpsManager.setUidMode(appOp, applicationInfo.uid, mode);
         } else {

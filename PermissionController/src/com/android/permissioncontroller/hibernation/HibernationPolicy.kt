@@ -495,11 +495,11 @@ suspend fun isPackageHibernationExemptByUser(
         AppOpLiveData[packageName,
             AppOpsManager.OPSTR_AUTO_REVOKE_PERMISSIONS_IF_UNUSED, packageUid]
             .getInitializedValue()
-    if (allowlistAppOpMode == AppOpsManager.MODE_DEFAULT) {
+    /*if (allowlistAppOpMode == AppOpsManager.MODE_DEFAULT) {
         // Initial state - allowlist not explicitly overridden by either user or installer
         if (DEBUG_OVERRIDE_THRESHOLDS) {
             // Suppress exemptions to allow debugging
-            return false
+            //return false
         }
 
         if (hibernationTargetsPreSApps()) {
@@ -516,9 +516,9 @@ suspend fun isPackageHibernationExemptByUser(
                 }
 
         return pkg.targetSdkVersion <= maxTargetSdkVersionForExemptApps
-    }
+    }*/
     // Check whether user/installer exempt
-    return allowlistAppOpMode != AppOpsManager.MODE_ALLOWED
+    return true; //allowlistAppOpMode != AppOpsManager.MODE_ALLOWED
 }
 
 private fun Context.isPackageCrossProfile(pkg: String): Boolean {
