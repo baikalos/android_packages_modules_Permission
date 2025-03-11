@@ -51,7 +51,7 @@ public class Permissions {
 
     private static final String LOG_TAG = Permissions.class.getSimpleName();
 
-    private static final boolean DEBUG = true;
+    private static final boolean DEBUG = false;
 
     private static ArrayMap<String, String> sForegroundToBackgroundPermission;
     private static ArrayMap<String, List<String>> sBackgroundToForegroundPermissions;
