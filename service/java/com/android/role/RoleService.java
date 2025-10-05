@@ -23,6 +23,7 @@ import android.annotation.NonNull;
 import android.annotation.Nullable;
 import android.annotation.UserIdInt;
 import android.annotation.WorkerThread;
+import android.app.ActivityManager;
 import android.app.AppOpsManager;
 import android.app.role.IOnRoleHoldersChangedListener;
 import android.app.role.IRoleManager;
@@ -90,7 +91,7 @@ import java.util.concurrent.TimeoutException;
 public class RoleService extends SystemService implements RoleUserState.Callback {
     private static final String LOG_TAG = RoleService.class.getSimpleName();
 
-    private static final boolean DEBUG = false;
+    private static final boolean DEBUG = true;
 
     private static final long GRANT_DEFAULT_ROLES_INTERVAL_MILLIS = 1000;
 
@@ -98,6 +99,9 @@ public class RoleService extends SystemService implements RoleUserState.Callback
     private final AppOpsManager mAppOpsManager;
     @NonNull
     private final UserManager mUserManager;
+    @NonNull
+    private final ActivityManager mActivityManager;
+
 
     @NonNull
     private final Object mLock = new Object();
@@ -150,6 +154,7 @@ public class RoleService extends SystemService implements RoleUserState.Callback
 
         mAppOpsManager = context.getSystemService(AppOpsManager.class);
         mUserManager = context.getSystemService(UserManager.class);
+        mActivityManager = context.getSystemService(ActivityManager.class);
 
         LocalManagerRegistry.addManager(RoleManagerLocal.class, new Local());
 
@@ -381,6 +386,25 @@ public class RoleService extends SystemService implements RoleUserState.Callback
         @Override
         public boolean isRoleHeld(@NonNull String roleName, @NonNull String packageName) {
             int callingUid = getCallingUid();
+            if (DEBUG) Log.d(LOG_TAG, "isRoleHeld: " + roleName + " for " + packageName + " from " + callingUid);
+
+            if( "android.app.role.DIALER".equals(roleName) ) {
+                if( mActivityManager.getBaikalPackageOption(packageName,getCallingUid(),201,0) == 1 ) {
+                    Log.d(LOG_TAG, "isRoleHeld spoofed: " + roleName + " for " + packageName + " from " + callingUid);
+                    return true;
+                }
+            } else if("android.app.role.SMS".equals(roleName) ) {
+                if( mActivityManager.getBaikalPackageOption(packageName,getCallingUid(),202,0) == 1 ) {
+                    Log.d(LOG_TAG, "isRoleHeld spoofed: " + roleName + " for " + packageName + " from " + callingUid);
+                    return true;
+                }
+            } else if("android.app.role.CALL_SCREENING".equals(roleName) ) {
+                if( mActivityManager.getBaikalPackageOption(packageName,getCallingUid(),203,0) == 1 ) {
+                    Log.d(LOG_TAG, "isRoleHeld spoofed: " + roleName + " for " + packageName + " from " + callingUid);
+                    return true;
+                }
+            }
+
             mAppOpsManager.checkPackage(callingUid, packageName);
 
             Preconditions.checkStringNotEmpty(roleName, "roleName cannot be null or empty");
@@ -397,6 +421,9 @@ public class RoleService extends SystemService implements RoleUserState.Callback
         @NonNull
         @Override
         public List<String> getRoleHoldersAsUser(@NonNull String roleName, @UserIdInt int userId) {
+
+            if (DEBUG) Log.d(LOG_TAG, "getRoleHoldersAsUser: " + roleName + " from " + getCallingUid());
+
             PermissionUtils.enforceCrossUserPermission(userId, false, "getRoleHoldersAsUser",
                     getContext());
             if (!isUserExistent(userId)) {
