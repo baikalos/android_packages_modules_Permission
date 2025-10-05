@@ -542,9 +542,12 @@ public class GrantPermissionsActivity extends SettingsActivity
     @Override
     public void onPermissionGrantResult(String name,
             @GrantPermissionsViewHandler.Result int result) {
+
         if (checkKgm(name, null, result)) {
             return;
         }
+
+        if( name == null ) return;
 
         if (name.equals(mPreMergeShownGroupName)) {
             mPreMergeShownGroupName = null;
@@ -564,6 +567,8 @@ public class GrantPermissionsActivity extends SettingsActivity
         if (checkKgm(name, affectedForegroundPermissions, result)) {
             return;
         }
+
+        if( name == null ) return;
 
         if (name.equals(mPreMergeShownGroupName)) {
             mPreMergeShownGroupName = null;
