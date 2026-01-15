@@ -29,6 +29,7 @@ import android.app.role.IOnRoleHoldersChangedListener;
 import android.app.role.IRoleManager;
 import android.app.role.RoleControllerManager;
 import android.app.role.RoleManager;
+import android.baikalos.BaikalAppProfile;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -625,6 +626,28 @@ public class RoleService extends SystemService implements RoleUserState.Callback
         @Override
         public boolean isRoleHeldAsUser(@NonNull String roleName, @NonNull String packageName,
                 @UserIdInt int userId) {
+
+            final int callingUid = getCallingUid();
+
+            if (DEBUG) Log.d(LOG_TAG, "isRoleHeldAsUser: " + roleName + " for " + packageName + " from " + callingUid);
+
+            if( "android.app.role.DIALER".equals(roleName) ) {
+                if( getContext().getBaikalContext().getBaikalPackageOption(packageName,getCallingUid(),BaikalAppProfile.BAIKAL_OPCODE_DEFAULT_DIALER,0) == 1 ) {
+                    Log.d(LOG_TAG, "isRoleHeldAsUser spoofed: " + roleName + " for " + packageName + " from " + callingUid);
+                    return true;
+                }
+            } else if("android.app.role.SMS".equals(roleName) ) {
+                if( getContext().getBaikalContext().getBaikalPackageOption(packageName,getCallingUid(),BaikalAppProfile.BAIKAL_OPCODE_DEFAULT_SMS,0) == 1 ) {
+                    Log.d(LOG_TAG, "isRoleHeldAsUser spoofed: " + roleName + " for " + packageName + " from " + callingUid);
+                    return true;
+                }
+            } else if("android.app.role.CALL_SCREENING".equals(roleName) ) {
+                if( getContext().getBaikalContext().getBaikalPackageOption(packageName,getCallingUid(),BaikalAppProfile.BAIKAL_OPCODE_DEFAULT_CALLERID,0) == 1 ) {
+                    Log.d(LOG_TAG, "isRoleHeldAsUser spoofed: " + roleName + " for " + packageName + " from " + callingUid);
+                    return true;
+                }
+            }
+
             mAppOpsManager.checkPackage(getCallingUid(), packageName);
 
             UserUtils.enforceCrossUserPermission(userId, /* allowAll= */ false,
